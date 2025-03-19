@@ -13,7 +13,9 @@ var app = express();
 
 const cors = require('cors');
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : ["http://localhost:3000", "http://127.0.0.1:3000"];
 
 const corsOptions = {
     origin: function (origin, callback) {
