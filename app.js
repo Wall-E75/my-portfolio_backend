@@ -15,13 +15,15 @@ const cors = require('cors');
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',')
-    : ["http://localhost:3000", "http://127.0.0.1:3000"];
+    : ["http://localhost:3001", "http://localhost:3000", "http://127.0.0.1:3000", "http://0.0.0.0:3001"];
 
 const corsOptions = {
     origin: function (origin, callback) {
+        console.log('Requête reçue depuis :', origin);
         if (allowedOrigins.includes(origin) || !origin) {
             callback(null, true);
         } else {
+            console.log('Origine refusée par CORS:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
