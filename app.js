@@ -27,12 +27,15 @@ const corsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
 }
 
 app.use(cors(corsOptions)); // On ajoute cors à notre application
+app.use(express.json());
+
+app.options("*", cors(corsOptions)); // Gère explixitement les requêtes OPTIONS (important sur Vercel)
 
 app.use(logger('dev'));
 app.use(express.json());
