@@ -33,8 +33,6 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions)); // On ajoute cors à notre application
-app.use(express.json());
-
 app.options("*", cors(corsOptions)); // Gère explixitement les requêtes OPTIONS (important sur Vercel)
 
 app.use(logger('dev'));
