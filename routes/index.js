@@ -3,9 +3,19 @@ var router = express.Router();
 const Message = require('../models/messages');
 const { checkBody } = require('../modules/checkBody')
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+/* GET all messages*/
+router.get('/all', async (req, res) => {
+  try {
+    const allMessages = await Message.find();
+    if (!allMessages) {
+      console.log('Aucun message récupéré');
+      return;
+    }
+    console.log('Meesages all', allMessages);
+    res.json({result: true, allMessages});
+  } catch(error) {
+    console.error('erreur', error);
+  }
 });
 
 /* POST message */
