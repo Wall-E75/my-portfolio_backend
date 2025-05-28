@@ -1,0 +1,26 @@
+.
+-- .env
+-- .git
+-- .gitignore
+-- app.js
+-- bin
+   -- www
+-- models
+   -- connection.js
+   -- messages.js
+-- modules
+   -- checkBody.js
+-- node_modules
+-- package.json
+-- public
+   -- images
+   -- index.html
+   -- javascripts
+   -- stylesheets
+      -- style.css
+-- routes
+   -- index.js
+   -- users.js
+-- structure.txt
+-- vercel.json
+-- yarn.lock
