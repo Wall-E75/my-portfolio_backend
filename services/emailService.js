@@ -29,7 +29,29 @@ const sendContactNotification = async (messageData, isNewContact) => {
             from: process.env.EMAIL_USER,
             to: process.env.NOTIFICATION_EMAIL || process.env.EMAIL_USER,
             subject: `Nouveau message portfolio - ${messageData.firstname} ${messageData.lastname}`,
-            html: `...` // Template HTML
+            html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h2 style="color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px;">
+                        ${isNewContact ? '🆕 Nouveau contact' : '💬 Nouveau message'}
+                    </h2>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                        <h3 style="margin-top: 0; color: #495057;">Informations du contact :</h3>
+                        <p><strong>Nom :</strong> ${messageData.lastname}</p>
+                        <p><strong>Prénom :</strong> ${messageData.firstname}</p>
+                        <p><strong>Email :</strong> <a href="mailto:${messageData.email}">${messageData.email}</a></p>
+                        <p><strong>Type :</strong> ${isNewContact ? 'Premier contact' : 'Contact existant'}</p>
+                    </div>
+                    
+                    <div style="background: #fff; padding: 20px; border-left: 4px solid #28a745; margin: 20px 0; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #495057;">Message :</h3>
+                        <p style="font-style: italic; line-height: 1.6; color: #6c757d;">"${messageData.messages}"</p>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6; color: #6c757d; font-size: 14px;">
+                        <p>📅 Reçu le : ${new Date().toLocaleString('fr-FR')}</p>
+                        <p>🌐 Depuis : Portfolio Wali Sylla</p>
+                    </div>
+                </div>` // Template HTML
     };
 
     const result = await transporter.sendMail(mailOptions);

@@ -62,7 +62,7 @@ router.post('/message', messageRateLimit, async (req, res) =>{
     }
 
     // Validation longueur message
-    if (req.body.messages.lenght > 200) {
+    if (req.body.messages.length > 200) {
       return res.status(400).json({
         result: false,
         message: 'Message trop long (max 200 caractères)'
