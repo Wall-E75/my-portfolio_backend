@@ -43,14 +43,17 @@ router.get('/all', async (req, res) => {
 /* POST message */
 router.post('/message', messageRateLimit, async (req, res) =>{
   try {
+    console.log('📩 === NOUVELLE REQUÊTE REÇUE ===');
+    console.log('Body reçu:', req.body);
     // Validation des champs
     if (!checkBody(req.body, ['lastname', 'firstname', 'email', 'messages'])) {
-      console.log('Requete reçu avec body => : ', req.body);
+      console.log('❌ Validation échouée - champs manquants');
       return res.status(400).json({ 
         result: false, 
         message: 'Tous les champs sont obligatoires' 
       });
     };
+    console.log('✅ Validation des champs OK');
 
     // Validation format email
     const emailRegex =/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -60,7 +63,7 @@ router.post('/message', messageRateLimit, async (req, res) =>{
         message: 'Format d\'email invalide' 
       });
     }
-
+    console.log('✅ Validation email OK');
     // Validation longueur message
     if (req.body.messages.length > 200) {
       return res.status(400).json({
@@ -76,9 +79,10 @@ router.post('/message', messageRateLimit, async (req, res) =>{
       email: req.body.email.trim().toLowerCase(),
       messages: req.body.messages.trim()
     };
-
+    console.log('📝 Données nettoyées:', cleanData);
     //Recherche contact existant
     const existContact = await Message.findOne({email: { $regex: new RegExp(req.body.email, 'i') }});
+    console.log('🔍 Contact existant trouvé:', !!existContact);
 
     let savedMessage;
     let isNewContact = false;
@@ -108,11 +112,29 @@ router.post('/message', messageRateLimit, async (req, res) =>{
       console.log('Message ajouté au contact existant');
     }
 
+     // Envoi des emails avec gestion d'erreur
+    console.log('📧 === DÉBUT ENVOI EMAILS ===');
+    
+    try {
+      console.log('📧 Envoi notification...');
+      const notificationSent = await sendContactNotification(cleanData, isNewContact);
+      console.log('📧 Notification envoyée:', notificationSent ? '✅' : '❌');
+      
+      console.log('📧 Envoi confirmation...');
+      const confirmationSent = await sendConfirmationEmail(cleanData);
+      console.log('📧 Confirmation envoyée:', confirmationSent ? '✅' : '❌');
+    } catch (emailError) {
+      console.error('❌ Erreur lors de l\'envoi des emails:', emailError);
+      // On continue quand même, les emails ne sont pas critiques
+    }
+
+    console.log('📧 === FIN ENVOI EMAILS ===');
      // Envoi des emails (asynchrone - ne bloque pas la réponse)
-    sendContactNotification(cleanData, isNewContact);
-    sendConfirmationEmail(cleanData);
+    // sendContactNotification(cleanData, isNewContact);
+    // sendConfirmationEmail(cleanData);
 
     // Réponse succès
+    console.log('✅ Envoi réponse succès au client');
     res.json({ 
       result: true, 
       response: isNewContact ? 'Nouveau contact créé' : 'Message ajouté',
@@ -121,7 +143,7 @@ router.post('/message', messageRateLimit, async (req, res) =>{
 
   } catch(error) {
     console.error('Erreur MongoDb : ', error);
-      res.status(500).json({ result: false, message: 'Erreur serveur lors de la sauvegarde'});
+      res.status(500).json({ result: false, message: 'Erreur serveur lors de la sauvegarde : ' + error.message});
   }
      
 });

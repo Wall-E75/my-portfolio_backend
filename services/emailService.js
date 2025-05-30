@@ -14,14 +14,7 @@ const transporter = nodemailer.createTransport({
         rejectUnauthorized: false
     }
 })
-//Protection anti-spam
-const messageRateLimit = rateLimit({
-    windowMs: 15 * 60 * 1000, //15 minutes
-    max: 3, // Max 3 messages par IP toutes les 15 minutes
-    message: { result: false, message: 'Trop de message envoyés. Réessayez dans 15 minutes.'},
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+
 
 const sendContactNotification = async (messageData, isNewContact) => {
      try {
