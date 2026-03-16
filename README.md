@@ -1,6 +1,6 @@
 # Portfolio Backend API
 
-API REST backend pour le formulaire de contact d'un portfolio. Gère le stockage des messages, la déduplication par email, et l'envoi de notifications par email (propriétaire + confirmation expéditeur).
+API REST backend pour le formulaire de contact d'un portfolio. Gère le stockage persistant des messages, la déduplication par email, et l'envoi de notifications par email.
 
 ## Stack technique
 
@@ -10,11 +10,28 @@ API REST backend pour le formulaire de contact d'un portfolio. Gère le stockage
 - **Email** — Nodemailer (Gmail SMTP)
 - **Déploiement** — Vercel (serverless)
 
+## Choix techniques
+
+### Pourquoi une base de données ?
+
+Un simple envoi d'email aurait suffi pour le besoin immédiat. Le choix de persister les messages en MongoDB est délibéré :
+
+- **Historique complet** — tous les échanges avec un contact sont accessibles et regroupés, indépendamment de l'état de la boîte mail
+- **Déduplication** — un même contact qui envoie plusieurs messages est reconnu par son email ; ses messages sont agrégés dans un seul document plutôt que dispersés
+- **Extensibilité** — la structure permet d'ajouter facilement un backoffice (marquer comme lu, répondre, filtrer) sans migration complexe
+
+### Pourquoi le double email ?
+
+- **Notification au propriétaire** — alerte immédiate à chaque nouveau message
+- **Confirmation à l'expéditeur** — améliore l'expérience utilisateur et évite les envois en double par incertitude
+
+Les emails sont non bloquants : un échec d'envoi ne renvoie pas d'erreur au client, la sauvegarde en base reste prioritaire.
+
 ## Fonctionnalités
 
-- **Gestion des contacts** — stockage en MongoDB ; les messages successifs d'un même email sont ajoutés au document existant plutôt que de créer un doublon
-- **Double notification email** — envoi d'une notification HTML au propriétaire et d'un email de confirmation à l'expéditeur à chaque nouveau message
-- **Validation des entrées** — champs requis, format email (regex), limite de longueur de message (200 caractères)
+- **Gestion des contacts** — stockage en MongoDB ; les messages successifs d'un même email sont ajoutés au document existant
+- **Double notification email** — notification HTML au propriétaire + confirmation à l'expéditeur
+- **Validation des entrées** — champs requis, format email (regex), limite de 200 caractères
 - **Rate limiting** — 3 requêtes par IP toutes les 15 minutes sur `POST /message`
 - **CORS** — liste d'origines autorisées configurable via variable d'environnement
 
@@ -29,12 +46,11 @@ routes/index.js              ← Endpoints de l'API
         └── rateLimitConfig.js        ← Configuration express-rate-limit
 ```
 
-## Endpoints
+## Endpoint
 
 | Méthode | Route | Description |
 |---------|-------|-------------|
 | `GET` | `/` | Informations sur l'API |
-| `GET` | `/all` | Récupérer tous les contacts et messages |
 | `POST` | `/message` | Envoyer un nouveau message |
 
 ### `POST /message`
@@ -64,7 +80,10 @@ routes/index.js              ← Endpoints de l'API
 # Installer les dépendances
 yarn install
 
-# Démarrer le serveur
+# Mode développement (rechargement automatique)
+yarn dev
+
+# Mode production
 yarn start
 ```
 
