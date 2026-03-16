@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-const rateLimit = require('express-rate-limit');
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -11,7 +10,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     },
     tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: true
     }
 })
 
