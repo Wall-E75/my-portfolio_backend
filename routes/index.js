@@ -129,10 +129,6 @@ router.post('/message', messageRateLimit, async (req, res) =>{
     }
 
     console.log('📧 === FIN ENVOI EMAILS ===');
-     // Envoi des emails (asynchrone - ne bloque pas la réponse)
-    // sendContactNotification(cleanData, isNewContact);
-    // sendConfirmationEmail(cleanData);
-
     // Réponse succès
     console.log('✅ Envoi réponse succès au client');
     res.json({ 
