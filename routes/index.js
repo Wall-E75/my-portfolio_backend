@@ -2,43 +2,23 @@ var express = require('express');
 var router = express.Router();
 const Message = require('../models/messages');
 const { checkBody } = require('../modules/checkBody');
-const { 
-  sendContactNotification, 
-  sendConfirmationEmail, 
-  sendTestEmail, 
-  testConnection 
+const {
+  sendContactNotification,
+  sendConfirmationEmail
 } = require('../services/emailService');
 const { messageRateLimit } = require('../modules/rateLimitConfig');
 
 
 /* GET home page */
 router.get('/', function(req, res, next) {
-  res.json({ 
-    message: 'Portfolio Backend API', 
+  res.json({
+    message: 'Portfolio Backend API',
     endpoints: {
-      'GET /all': 'Récupérer tous les messages',
-      'POST /message': 'Envoyer un nouveau message',
-      'GET /test-email': 'Tester l\'envoi d\'email',
-      'GET /test-email-config': 'Tester la configuration email'
+      'POST /message': 'Envoyer un nouveau message'
     }
   });
 });
 
-/* GET all messages*/
-router.get('/all', async (req, res) => {
-  try {
-    const allMessages = await Message.find().sort({ createdAt: -1 }); //Trie du plus récent au plus ancien
-    if (!allMessages || allMessages.length === 0) {
-      console.log('Aucun message récupéré');
-      return res.json({ result: true, allMessages: []});
-    }
-    console.log(`${allMessages.length} messages récupérés`);
-    res.json({result: true, allMessages});
-  } catch(error) {
-    console.error('Erreur récupération message', error);
-    res.status(500).json({ result: false, message: 'Erreur serveur' });
-  }
-});
 
 /* POST message */
 router.post('/message', messageRateLimit, async (req, res) =>{
@@ -144,29 +124,5 @@ router.post('/message', messageRateLimit, async (req, res) =>{
      
 });
 
-/* Routes de test email */
-router.get('/test-email', async (req, res) => {
-  try {
-    const success = await sendTestEmail();
-    res.json({ 
-      result: success, 
-      message: success ? 'Email de test envoyé' : 'Erreur envoi email' 
-    });
-  } catch (error) {
-    res.json({ result: false, error: error.message });
-  }
-});
-
-router.get('/test-email-config', async (req, res) => {
-  try {
-    const isValid = await testConnection();
-    res.json({ 
-      result: isValid, 
-      message: isValid ? 'Configuration email valide' : 'Configuration email invalide' 
-    });
-  } catch (error) {
-    res.json({ result: false, error: error.message });
-  }
-});
 
 module.exports = router;

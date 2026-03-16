@@ -89,38 +89,7 @@ const sendConfirmationEmail = async (messageData) => {
     }
 };
 
-// Fonction de test
-const sendTestEmail = async () => {
-  try {
-    const testData = {
-      firstname: 'Test',
-      lastname: 'User',
-      email: 'test@example.com',
-      messages: 'Ceci est un email de test'
-    };
-
-    return await sendContactNotification(testData, true);
-  } catch (error) {
-    console.error('❌ Erreur email de test:', error);
-    return false;
-  }
-};
-
-// Test de configuration
-const testConnection = async () => {
-  try {
-    await transporter.verify();
-    console.log('✅ Configuration email valide');
-    return true;
-  } catch (error) {
-    console.error('❌ Erreur configuration email:', error);
-    return false;
-  }
-};
-
 module.exports = {
   sendContactNotification,
-  sendConfirmationEmail,
-  sendTestEmail,
-  testConnection
+  sendConfirmationEmail
 };
