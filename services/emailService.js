@@ -1,5 +1,14 @@
 const nodemailer = require('nodemailer');
 
+const escapeHtml = (str) => {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+};
+
 const transporter = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
@@ -17,10 +26,15 @@ const transporter = nodemailer.createTransport({
 
 const sendContactNotification = async (messageData, isNewContact) => {
      try {
+        const firstname = escapeHtml(messageData.firstname);
+        const lastname = escapeHtml(messageData.lastname);
+        const email = escapeHtml(messageData.email);
+        const message = escapeHtml(messageData.messages);
+
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: process.env.NOTIFICATION_EMAIL || process.env.EMAIL_USER,
-            subject: `Nouveau message portfolio - ${messageData.firstname} ${messageData.lastname}`,
+            subject: `Nouveau message portfolio - ${firstname} ${lastname}`,
             html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <h2 style="color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px;">
                         ${isNewContact ? '🆕 Nouveau contact' : '💬 Nouveau message'}
@@ -28,15 +42,15 @@ const sendContactNotification = async (messageData, isNewContact) => {
                     
                     <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
                         <h3 style="margin-top: 0; color: #495057;">Informations du contact :</h3>
-                        <p><strong>Nom :</strong> ${messageData.lastname}</p>
-                        <p><strong>Prénom :</strong> ${messageData.firstname}</p>
-                        <p><strong>Email :</strong> <a href="mailto:${messageData.email}">${messageData.email}</a></p>
+                        <p><strong>Nom :</strong> ${lastname}</p>
+                        <p><strong>Prénom :</strong> ${firstname}</p>
+                        <p><strong>Email :</strong> <a href="mailto:${email}">${email}</a></p>
                         <p><strong>Type :</strong> ${isNewContact ? 'Premier contact' : 'Contact existant'}</p>
                     </div>
                     
                     <div style="background: #fff; padding: 20px; border-left: 4px solid #28a745; margin: 20px 0; border-radius: 4px;">
                         <h3 style="margin-top: 0; color: #495057;">Message :</h3>
-                        <p style="font-style: italic; line-height: 1.6; color: #6c757d;">"${messageData.messages}"</p>
+                        <p style="font-style: italic; line-height: 1.6; color: #6c757d;">"${message}"</p>
                     </div>
                     
                     <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6; color: #6c757d; font-size: 14px;">
@@ -59,6 +73,8 @@ const sendContactNotification = async (messageData, isNewContact) => {
 
 const sendConfirmationEmail = async (messageData) => {
     try {
+        const firstname = escapeHtml(messageData.firstname);
+        const message = escapeHtml(messageData.messages);
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: messageData.email,
@@ -66,12 +82,12 @@ const sendConfirmationEmail = async (messageData) => {
             html: `
                 <div>
             <h2>Merci pour votre message !</h2>
-            <p>Bonjour ${messageData.firstname},</p>
+            <p>Bonjour ${firstname},</p>
             <p>J'ai bien reçu votre message et je vous répondrai dans les plus brefs délais.</p>
             
             <div>
                 <p><strong>Votre message :</strong></p>
-                <p>"${messageData.messages}"</p>
+                <p>"${message}"</p>
             </div>
             
             <p>À bientôt !</p>
