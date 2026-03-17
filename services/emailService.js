@@ -54,7 +54,7 @@ const sendContactNotification = async (messageData, isNewContact) => {
                     </div>
                     
                     <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6; color: #6c757d; font-size: 14px;">
-                        <p>📅 Reçu le : ${new Date().toLocaleString('fr-FR')}</p>
+                        <p>📅 Reçu le : ${new Date().toLocaleString('fr-FR', {timeZone: 'Europe/Paris'})}</p>
                         <p>🌐 Depuis : Portfolio Wali Sylla</p>
                     </div>
                 </div>` // Template HTML
