@@ -106,3 +106,13 @@ NOTIFICATION_EMAIL=proprietaire@example.com
 Déployé sur Vercel via `vercel.json`. Toutes les routes sont gérées par `app.js` en tant que fonction serverless.
 
 Définir les variables d'environnement dans le tableau de bord Vercel avant de déployer.
+
+## Dépannage
+
+### Erreur CORS dans le navigateur + `504 Gateway Timeout`
+
+Si le frontend affiche une erreur `blocked by CORS policy` accompagnée d'un `504 Gateway Timeout` (et non une simple erreur 4xx), il ne s'agit généralement **pas** d'un problème de configuration CORS : une réponse qui expire n'a pas le temps de passer par le middleware CORS, donc le navigateur signale l'absence du header `Access-Control-Allow-Origin` alors que la vraie cause est ailleurs.
+
+Cause la plus fréquente : le cluster **MongoDB Atlas (tier M0 gratuit)** se met en pause après une période d'inactivité. La tentative de reconnexion bloque la fonction serverless jusqu'à dépasser la limite d'exécution de Vercel (10s sur le plan Hobby), d'où le 504.
+
+**Solution** : dans le [dashboard MongoDB Atlas](https://cloud.mongodb.com), vérifier le statut du cluster et cliquer sur *Resume* s'il est en pause.
